@@ -1,10 +1,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
+using UnityEngine;
 
 public static class Timer
 {
     private static readonly Stopwatch stopwatch = new();
     private static List<long> steps = new();
+
+    private static readonly string filePath =
+        Path.Combine(Application.persistentDataPath, "score.txt");
 
     public static bool IsRunning
     {
@@ -26,9 +32,6 @@ public static class Timer
         return steps[index] * 0.001f;
     }
 
-    /// <summary>
-    /// Reset the timer and remove any steps.
-    /// </summary>
     public static void Reset()
     {
         stopwatch.Reset();
@@ -52,13 +55,67 @@ public static class Timer
 
     public static void Save()
     {
-        // TODO : save our time steps (line 7 of this script) inside a file.
+        if (steps.Count == 0)
+            return;
+
+        long currentFinalTime = steps[^1];
+
+        if (File.Exists(filePath))
+        {
+            string encoded = File.ReadAllText(filePath);
+
+            string decoded = Encoding.UTF8.GetString(
+                System.Convert.FromBase64String(encoded)
+            );
+
+            string[] savedValues = decoded.Split(',');
+
+            long previousFinalTime = long.Parse(savedValues[^1]);
+
+            if (currentFinalTime >= previousFinalTime)
+            {
+                UnityEngine.Debug.Log("Record non battu.");
+                return;
+            }
+        }
+
+        string data = string.Join(",", steps);
+
+        string encodedData = System.Convert.ToBase64String(
+            Encoding.UTF8.GetBytes(data)
+        );
+
+        File.WriteAllText(filePath, encodedData);
+
+        UnityEngine.Debug.Log("Nouveau record sauvegardé !");
     }
 
     public static void Load()
     {
-        // TODO : load our time steps from a file (if we have any)
-        // and store them inside our steps variable (line 7 of this script)
-        // to show them to the player before starting a race.
+        if (!File.Exists(filePath))
+        {
+            UnityEngine.Debug.Log("Aucune sauvegarde trouvée.");
+            return;
+        }
+
+        string encoded = File.ReadAllText(filePath);
+
+        string decoded = Encoding.UTF8.GetString(
+            System.Convert.FromBase64String(encoded)
+        );
+
+        string[] loadedSteps = decoded.Split(',');
+
+        steps.Clear();
+
+        foreach (string value in loadedSteps)
+        {
+            if (long.TryParse(value, out long result))
+            {
+                steps.Add(result);
+            }
+        }
+
+        UnityEngine.Debug.Log("Steps chargés : " + steps.Count);
     }
 }

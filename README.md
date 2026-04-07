@@ -46,3 +46,14 @@ Et aussi rajoute à la fin de ce fichier **README.md** ce que tu a rajouté dans
 Il y a quelque assets dans le dossier des Models mais tu peux en importer d'autres (je te recommande à nouveau le site de [Kenney](https://kenney.nl/assets)).
 
 Ce que tu a rajouté dans le projet :
+
+Ajout d’un système de sauvegarde des étapes du timer dans un fichier score.txt.
+
+Les étapes sont sauvegardées sous forme de texte encodé en Base64 afin d’éviter une modification simple du fichier.
+
+Le chargement automatique des étapes précédentes est effectué au lancement du niveau afin d’afficher les anciens temps au joueur.
+
+Le système sauvegarde uniquement si le joueur bat son précédent record.
+
+Ajout d’un affichage des anciens temps de checkpoints avant le lancement d’une nouvelle course afin d’améliorer le retour joueur.
+
